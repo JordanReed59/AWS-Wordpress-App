@@ -1,0 +1,78 @@
+name: "Terraform Destroy"
+on:
+  workflow_dispatch: {}
+permissions:
+      id-token: write # This is required for aws oidc connection
+      contents: read # This is required for actions/checkout
+      pull-requests: write # This is required for gh bot to comment PR
+env:
+  TF_LOG: INFO
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+  AWS_BUCKET_KEY_NAME: ${{ secrets.AWS_BUCKET_KEY_NAME }}
+  AWS_TF_ROLE: ${{ secrets.AWS_TF_ROLE }}
+  GITHUB_BRANCH_NAME: ${{ github.ref_name }}
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: .aws/terraform
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Set ENV variables
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "Using PROD Role"
+            echo "AWS_ROLE=${{ secrets.AWS_PROD_ROLE }}" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/heads/main ]]; then
+            echo "Using QA Role"
+            echo "AWS_ROLE=${{ secrets.AWS_QA_ROLE }}" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/heads/develop ]]; then
+            echo "Using Test Role"
+            echo "AWS_ROLE=${{ secrets.AWS_TEST_ROLE }}" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/heads/feature/* || $GITHUB_REF == refs/heads/bugfix/* || $GITHUB_REF == refs/heads/task/* || $GITHUB_REF == refs/heads/hotfix/* ]]; then
+            echo "Using Dev Role"
+            echo "AWS_ROLE=${{ secrets.AWS_DEV_ROLE }}" >> $GITHUB_ENV
+          else
+            echo "Invalid branch name. Stopping the action."
+            exit 1
+          fi
+        
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHub-OIDC-TERRAFORM
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="key=${AWS_BUCKET_KEY_NAME}" -backend-config="region=${AWS_REGION}" -backend-config="role_arn=${AWS_TF_ROLE}"
+
+      - name: Terraform Workspaces
+        id: workspaces
+        run: |
+          chmod +x ../../.github/workflows/utils/workspaces.sh
+          source ../../.github/workflows/utils/workspaces.sh $GITHUB_BRANCH_NAME
+
+      - name: Terraform Variables
+        id: variables
+        run: |
+          echo "TF_VAR_repo=${REPO_NAME}" >> $GITHUB_ENV
+          echo "TF_VAR_environment=${ENV}" >> $GITHUB_ENV
+          echo "TF_VAR_branch=${GITHUB_BRANCH_NAME}" >> $GITHUB_ENV
+          echo "TF_VAR_region=${AWS_REGION}" >> $GITHUB_ENV
+
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
