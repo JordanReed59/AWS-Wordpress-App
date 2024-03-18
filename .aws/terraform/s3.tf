@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "allow_cloudfront_and_public_access" {
 #     resources = ["${aws_s3_bucket.media_bucket.arn}/*"]
 #     principals {
 #       type        = "AWS"
-#       identifiers = ["*"]
+#       identifiers = ["cloudfront arn"]
 #     }
 #   }
 }
