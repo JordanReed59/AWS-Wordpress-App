@@ -44,14 +44,14 @@ resource "aws_s3_bucket_public_access_block" "disable_block" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_acl" "bucket_acl" {
-  depends_on = [
-    aws_s3_bucket_public_access_block.disable_block
-  ]
+# resource "aws_s3_bucket_acl" "bucket_acl" {
+#   depends_on = [
+#     aws_s3_bucket_public_access_block.disable_block
+#   ]
 
-  bucket = aws_s3_bucket.media_bucket.id
-  acl    = "public-read"
-}
+#   bucket = aws_s3_bucket.media_bucket.id
+#   acl    = "public-read"
+# }
 
 # Code Bucket
 resource "aws_s3_bucket" "code_bucket" {
