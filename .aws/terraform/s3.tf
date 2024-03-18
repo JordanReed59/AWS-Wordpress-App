@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "media_bucket" {
 # bucket policy
 resource "aws_s3_bucket_policy" "allow_cloudfront_and_public_access" {
   bucket = aws_s3_bucket.media_bucket.id
-  policy = data.aws_iam_policy_document.allow_access_from_another_account.json
+  policy = data.aws_iam_policy_document.allow_cloudfront_and_public_access.json
 }
 
 data "aws_iam_policy_document" "allow_cloudfront_and_public_access" {
