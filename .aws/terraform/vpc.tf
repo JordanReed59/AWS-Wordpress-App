@@ -57,11 +57,6 @@ resource "aws_route_table_association" "public_subnet_asso" {
 # private compute route table
 resource "aws_route_table" "private_compute_rt" {
  vpc_id = aws_vpc.wordpress_vpc.id
- 
-#  route {
-#    cidr_block = var.vpc_cidr
-#    gateway_id = "local"
-#  }
  tags = merge(module.namespace.tags, {Name = "Private Compute Route Table"})
 }
 
@@ -74,11 +69,6 @@ resource "aws_route_table_association" "private_compute_subnet_asso" {
 # private database route table
 resource "aws_route_table" "private_db_compute_rt" {
  vpc_id = aws_vpc.wordpress_vpc.id
- 
-#  route {
-#    cidr_block = var.vpc_cidr
-#    gateway_id = "local"
-#  }
  tags = merge(module.namespace.tags, {Name = "Private Database Route Table"})
 }
 
@@ -89,9 +79,9 @@ resource "aws_route_table_association" "private_db_subnet_asso" {
 }
 
 # VPC Endpoint
-# resource "aws_vpc_endpoint" "s3" {
-#   vpc_id          = aws_vpc.wordpress_vpc.id
-#   service_name    = "com.amazonaws.${var.region}.s3"
-#   route_table_ids = ["${aws_route_table.private_compute_rt.id}"]
-#   tags = merge(module.namespace.tags, {Name = "my-s3-endpoint"})
-# }
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id          = aws_vpc.wordpress_vpc.id
+  service_name    = "com.amazonaws.${var.region}.s3"
+  route_table_ids = ["${aws_route_table.private_compute_rt.id}"]
+  tags = merge(module.namespace.tags, {Name = "my-s3-endpoint"})
+}
