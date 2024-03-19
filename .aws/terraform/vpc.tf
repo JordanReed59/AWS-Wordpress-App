@@ -1,6 +1,6 @@
 # VPC
 resource "aws_vpc" "wordpress_vpc" {
-  cidr_block       = "17.0.0.0/16"
+  cidr_block       = var.vpc_cidr
   instance_tenancy = "default"
 
   tags = merge(module.namespace.tags, {Name = "Wordpress VPC"})
@@ -37,6 +37,7 @@ resource "aws_subnet" "private_db_subnets" {
 }
 
 # Route Tables
+# public route table
 resource "aws_route_table" "publc_rt" {
  vpc_id = aws_vpc.wordpress_vpc.id
  
@@ -52,3 +53,45 @@ resource "aws_route_table_association" "public_subnet_asso" {
  subnet_id      = element(aws_subnet.public_subnets[*].id, count.index)
  route_table_id = aws_route_table.publc_rt.id
 }
+
+# private compute route table
+resource "aws_route_table" "private_compute_rt" {
+ vpc_id = aws_vpc.wordpress_vpc.id
+ 
+ route {
+   cidr_block = var.vpc_cidr
+   gateway_id = "local"
+ }
+ tags = merge(module.namespace.tags, {Name = "Private Compute Route Table"})
+}
+
+resource "aws_route_table_association" "private_compute_subnet_asso" {
+ count = length(var.public_sn_cidrs)
+ subnet_id      = element(aws_subnet.private_compute_subnets[*].id, count.index)
+ route_table_id = aws_route_table.private_compute_rt.id
+}
+
+# private database route table
+resource "aws_route_table" "private_db_compute_rt" {
+ vpc_id = aws_vpc.wordpress_vpc.id
+ 
+ route {
+   cidr_block = var.vpc_cidr
+   gateway_id = "local"
+ }
+ tags = merge(module.namespace.tags, {Name = "Private Database Route Table"})
+}
+
+resource "aws_route_table_association" "private_db_subnet_asso" {
+ count = length(var.public_sn_cidrs)
+ subnet_id      = element(aws_subnet.private_db_subnets[*].id, count.index)
+ route_table_id = aws_route_table.private_db_compute_rt.id
+}
+
+# VPC Endpoint
+# resource "aws_vpc_endpoint" "s3" {
+#   vpc_id          = aws_vpc.wordpress_vpc.id
+#   service_name    = "com.amazonaws.${var.region}.s3"
+#   route_table_ids = ["${aws_route_table.private_compute_rt.id}"]
+#   tags = merge(module.namespace.tags, {Name = "my-s3-endpoint"})
+# }

@@ -13,7 +13,11 @@ variable "environment" {
 variable "region" {
   type = string
 }
-
+variable "vpc_cidr" {
+  type = string
+  description = "Public Subnet CIDR blocks"
+  default = "17.0.0.0/16"
+}
 variable "public_sn_cidrs" {
   type = list(string)
   description = "Public Subnet CIDR blocks"
