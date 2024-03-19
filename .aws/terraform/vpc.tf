@@ -13,7 +13,7 @@ resource "aws_subnet" "public_subnets" {
  tags = merge(module.namespace.tags, {Name = "Public Subnet ${count.index + 1}"})
 }
  
-resource "aws_subnet" "private_subnets" {
+resource "aws_subnet" "private_compute_subnets" {
  count             = length(var.private_compute_sn_cidrs)
  vpc_id            = aws_vpc.wordpress_vpc.id
  cidr_block        = element(var.private_compute_sn_cidrs, count.index)
@@ -21,7 +21,7 @@ resource "aws_subnet" "private_subnets" {
  tags = merge(module.namespace.tags, {Name = "Private Compute Subnet ${count.index + 1}"})
 }
 
-resource "aws_subnet" "private_subnets" {
+resource "aws_subnet" "private_db_subnets" {
  count             = length(var.private_db_sn_cidrs)
  vpc_id            = aws_vpc.wordpress_vpc.id
  cidr_block        = element(var.private_db_sn_cidrs, count.index)
