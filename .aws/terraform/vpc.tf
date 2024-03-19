@@ -1,10 +1,17 @@
+# VPC
 resource "aws_vpc" "wordpress_vpc" {
   cidr_block       = "17.0.0.0/16"
   instance_tenancy = "default"
 
   tags = merge(module.namespace.tags, {Name = "Wordpress VPC"})
 }
+# Internet Gateway
+resource "aws_internet_gateway" "internet_gw" {
+ vpc_id = aws_vpc.wordpress_vpc.id
+ tags = merge(module.namespace.tags, {Name = "Wordpress VPC IGW"})
+}
 
+# Subnets
 resource "aws_subnet" "public_subnets" {
  count             = length(var.public_sn_cidrs)
  vpc_id            = aws_vpc.wordpress_vpc.id
