@@ -58,10 +58,10 @@ resource "aws_route_table_association" "public_subnet_asso" {
 resource "aws_route_table" "private_compute_rt" {
  vpc_id = aws_vpc.wordpress_vpc.id
  
- route {
-   cidr_block = var.vpc_cidr
-   gateway_id = "local"
- }
+#  route {
+#    cidr_block = var.vpc_cidr
+#    gateway_id = "local"
+#  }
  tags = merge(module.namespace.tags, {Name = "Private Compute Route Table"})
 }
 
@@ -75,10 +75,10 @@ resource "aws_route_table_association" "private_compute_subnet_asso" {
 resource "aws_route_table" "private_db_compute_rt" {
  vpc_id = aws_vpc.wordpress_vpc.id
  
- route {
-   cidr_block = var.vpc_cidr
-   gateway_id = "local"
- }
+#  route {
+#    cidr_block = var.vpc_cidr
+#    gateway_id = "local"
+#  }
  tags = merge(module.namespace.tags, {Name = "Private Database Route Table"})
 }
 
