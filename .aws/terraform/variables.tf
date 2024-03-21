@@ -41,3 +41,14 @@ variable "azs" {
   description = "Availability Zones"
   default = [ "us-east-1b", "us-east-1c" ]
 }
+
+variable "db_username" {
+  description = "DB username"
+  type = string
+  default = "admin"
+}
+variable "db_password" {
+  description = "DB password"
+  type = string
+  sensitive = true
+}
