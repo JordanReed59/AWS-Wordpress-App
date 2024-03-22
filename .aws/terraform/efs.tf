@@ -8,8 +8,7 @@ resource "aws_security_group" "efs_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "efs_sg_ec2" {
   security_group_id = aws_security_group.efs_sg.id
-  # referenced_security_group_id = aws_security_group.ec2_wordpress_sg.id
-  referenced_security_group_id = aws_security_group.ec2_sg.id
+  referenced_security_group_id = aws_security_group.ec2_wordpress_sg.id
   from_port         = 2049
   ip_protocol       = "tcp"
   to_port           = 2049
