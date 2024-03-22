@@ -56,10 +56,3 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
   to_port           = 443
   tags = merge(module.namespace.tags, {Name = "allow-ssh"})
 }
-
-# resource "aws_security_group" "ec2_sg" {
-#   name        = "ec2_wordpress_sg"
-#   description = "Allow TLS inbound traffic and all outbound traffic"
-#   vpc_id      = aws_vpc.wordpress_vpc.id
-#   tags = merge(module.namespace.tags, {Name = "ec2-sg"})
-# }
