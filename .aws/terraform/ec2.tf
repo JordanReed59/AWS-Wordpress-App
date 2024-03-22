@@ -36,7 +36,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_ssh" {
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
-  tags = merge(module.namespace.tags, {Name = "allow-ssh"})
+  tags = merge(module.namespace.tags, {Name = "allow-bastion-ssh"})
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_http" {
@@ -45,7 +45,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_http" {
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
-  tags = merge(module.namespace.tags, {Name = "allow-ssh"})
+  tags = merge(module.namespace.tags, {Name = "allow-alb-http"})
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
@@ -54,5 +54,8 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
-  tags = merge(module.namespace.tags, {Name = "allow-ssh"})
+  tags = merge(module.namespace.tags, {Name = "allow-alb-https"})
 }
+
+# EC2 Role
+# needs s3 efs and rds
