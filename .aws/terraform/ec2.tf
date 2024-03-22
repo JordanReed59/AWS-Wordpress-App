@@ -3,7 +3,7 @@ resource "aws_security_group" "ec2_bastion_sg" {
   name        = "ec2_bastion_sg"
   description = "Allow TLS inbound traffic and all outbound traffic"
   vpc_id      = aws_vpc.wordpress_vpc.id
-  tags = merge(module.namespace.tags, {Name = "ec2-sg"})
+  tags = merge(module.namespace.tags, {Name = "ec2-bastion-sg"})
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {

@@ -34,7 +34,8 @@ resource "aws_security_group" "rds_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "rds_sg_mysql_access" {
   security_group_id            = aws_security_group.rds_sg.id
-  referenced_security_group_id = aws_security_group.ec2_wordpress_sg.id
+  # referenced_security_group_id = aws_security_group.ec2_wordpress_sg.id
+  referenced_security_group_id = aws_security_group.ec2_sg.id
   from_port                    = 3306
   ip_protocol                  = "tcp"
   to_port                      = 3306
