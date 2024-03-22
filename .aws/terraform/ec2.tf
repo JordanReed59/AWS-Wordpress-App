@@ -61,5 +61,5 @@ resource "aws_security_group" "ec2_sg" {
   name        = "ec2_wordpress_sg"
   description = "Allow TLS inbound traffic and all outbound traffic"
   vpc_id      = aws_vpc.wordpress_vpc.id
-  tags = merge(module.namespace.tags, {Name = "ec2-wordpress-sg"})
+  tags = merge(module.namespace.tags, {Name = "ec2-sg"})
 }
