@@ -76,7 +76,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_rds_wordpress" {
-  security_group_id = aws_security_group.ec2_bastion_sg.id
+  security_group_id = aws_security_group.ec2_wordpress_sg.id
   referenced_security_group_id = aws_security_group.rds_sg.id
   from_port         = 3306
   ip_protocol       = "tcp"
