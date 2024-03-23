@@ -15,6 +15,15 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {
   tags = merge(module.namespace.tags, {Name = "allow-ssh"})
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_http" {
+  security_group_id = aws_security_group.ec2_bastion_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+  tags = merge(module.namespace.tags, {Name = "allow-alb-http"})
+}
+
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   security_group_id = aws_security_group.ec2_bastion_sg.id
   cidr_ipv4         = "0.0.0.0/0"
