@@ -53,7 +53,7 @@ resource "aws_s3_bucket_ownership_controls" "ownership" {
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
   depends_on = [
-    aws_s3_bucket_public_access_block.enable_block
+    aws_s3_bucket_ownership_controls.ownership
   ]
 
   bucket = aws_s3_bucket.media_bucket.id
