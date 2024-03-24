@@ -89,7 +89,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
 
 ################### EC2 Instance Profile and Role ###################
 resource "aws_iam_instance_profile" "test_profile" {
-  name = "EC2-Wordpress-Role"
+  name = "EC2-Wordpress-Profile"
   role = aws_iam_role.ec2_role.name
 }
 
