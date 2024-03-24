@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "policy" {
     sid = "AllowS3"
     effect    = "Allow"
     actions   = ["s3:*"]
-    resources = [aws_s3_bucket.media_bucket.arn]
+    resources = [aws_s3_bucket.media_bucket.arn, "${aws_s3_bucket.media_bucket.arn}/*"]
   }
 }
 
