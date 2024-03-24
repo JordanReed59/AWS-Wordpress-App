@@ -35,14 +35,14 @@ data "aws_iam_policy_document" "allow_cloudfront_and_public_access" {
 }
 
 # public bucket config
-resource "aws_s3_bucket_public_access_block" "disable_block" {
-  bucket = aws_s3_bucket.media_bucket.id
+# resource "aws_s3_bucket_public_access_block" "disable_block" {
+#   bucket = aws_s3_bucket.media_bucket.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
+#   block_public_acls       = false
+#   block_public_policy     = false
+#   ignore_public_acls      = false
+#   restrict_public_buckets = false
+# }
 
 # resource "aws_s3_bucket_acl" "bucket_acl" {
 #   depends_on = [
