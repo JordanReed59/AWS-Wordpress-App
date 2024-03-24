@@ -1,3 +1,4 @@
+################### Security Groups ###################
 # Bastion host security group
 resource "aws_security_group" "ec2_bastion_sg" {
   name        = "ec2_bastion_sg"
@@ -84,5 +85,54 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
 #   tags = merge(module.namespace.tags, {Name = "allow-rds-inbound-wordpress"})
 # }
 
-# EC2 Role
-# needs s3 efs and rds
+################### Security Groups ###################
+
+################### EC2 Role ###################
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "ec2_role" {
+  name               = "EC2-Wordpress-Role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  tags = module.namespace.tags
+}
+
+data "aws_iam_policy_document" "policy" {
+  statement {
+    sid = "AllowEFS"
+    effect    = "Allow"
+    actions   = ["elasticfilesystem:ClientMount",
+                "elasticfilesystem:ClientWrite",
+                "elasticfilesystem:DescribeMountTargets"
+              ]
+    resources = [aws_efs_file_system.wordpress_efs.arn]
+  }
+  statement {
+    sid = "AllowS3"
+    effect    = "Allow"
+    actions   = ["s3:*"]
+    resources = [aws_s3_bucket.media_bucket.arn]
+  }
+}
+
+resource "aws_iam_policy" "policy" {
+  name        = "Wordpress-S3-EFS-Policy"
+  description = "Policy allowing access to S3 and EFS"
+  policy      = data.aws_iam_policy_document.policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "policy_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.policy.arn
+}
+################### EC2 Role ###################
