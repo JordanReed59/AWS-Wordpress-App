@@ -87,7 +87,12 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
 
 ################### Security Groups ###################
 
-################### EC2 Role ###################
+################### EC2 Instance Profile and Role ###################
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "EC2-Wordpress-Role"
+  role = aws_iam_role.ec2_role.name
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
