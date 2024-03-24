@@ -49,6 +49,7 @@ resource "aws_s3_bucket_ownership_controls" "ownership" {
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
+  depends_on = [aws_s3_bucket_public_access_block.enable_block]
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
