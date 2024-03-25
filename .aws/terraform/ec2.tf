@@ -128,6 +128,13 @@ data "aws_iam_policy_document" "policy" {
     actions   = ["s3:*"]
     resources = [aws_s3_bucket.media_bucket.arn, "${aws_s3_bucket.media_bucket.arn}/*"]
   }
+  statement {
+    sid = "AllowEC2Describe"
+    effect    = "Allow"
+    actions   = ["ec2:DescribeInstances"]
+    resources = ["*"]
+  }
+  
 }
 
 resource "aws_iam_policy" "policy" {
