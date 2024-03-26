@@ -35,7 +35,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
   tags = merge(module.namespace.tags, {Name = "allow-alb-https"})
 }
 
-resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+resource "aws_vpc_security_group_egress_rule" "allow_all_outbound_traffic" {
   security_group_id = aws_security_group.ec2_wordpress_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
