@@ -74,6 +74,7 @@ data "aws_iam_policy_document" "policy" {
     actions   = ["elasticfilesystem:ClientMount",
                 "elasticfilesystem:ClientWrite",
                 "elasticfilesystem:DescribeMountTargets"
+                
               ]
     resources = [aws_efs_file_system.wordpress_efs.arn]
   }
@@ -86,7 +87,10 @@ data "aws_iam_policy_document" "policy" {
   statement {
     sid = "AllowEC2Describe"
     effect    = "Allow"
-    actions   = ["ec2:DescribeInstances"]
+    actions   = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeAvailabilityZones"
+    ]
     resources = ["*"]
   }
 }
