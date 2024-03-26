@@ -105,6 +105,59 @@ resource "aws_iam_role_policy_attachment" "policy_attach" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.policy.arn
 }
+
+# Launch Template
+data "aws_ami" "amzlinux2_wp" {
+  owners      = ["self"]
+  most_recent = true
+  filter {
+    name = "image-id"
+    values = ["ami-09b645e37f36e7c4e"]
+  }
+}
+
+resource "aws_launch_template" "wp_launch_template" {
+  name = "Wordpress-Launch-Template"
+  description = "My Wordpress Launch Template"
+  image_id = data.aws_ami.amzlinux2_wp.id
+  instance_type = "t2.micro"
+  key_name = "WordpressKeyPair.pem"
+  update_default_version = true
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups = [aws_security_group.ec2_wordpress_sg.id]
+  }
+  monitoring {
+    enabled = true
+  }
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(module.namespace.tags, {Name = "Wordpress"})
+  }
+}
+
+# Autoscaling Group
+resource "aws_autoscaling_group" "my_wp_asg" {
+  name_prefix = "wordpressasg-"
+  desired_capacity   = 2
+  max_size           = 2
+  min_size           = 2
+  vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
+  health_check_type = "EC2"
+  health_check_grace_period = 300 # default is 300 seconds  
+  # Launch Template
+  launch_template {
+    id      = aws_launch_template.wp_launch_template.id
+    version = aws_launch_template.wp_launch_template.latest_version
+  }
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+    triggers = [ "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
+  }       
+}
 ################### EC2 Role ###################
 
 ################### Bastion Host ###################
