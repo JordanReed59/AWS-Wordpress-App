@@ -170,7 +170,7 @@ resource "aws_launch_template" "bastion_launch_template" {
 
 # Autoscaling Group
 variable "extra_tags" {
-  default = [merge(module.namespace.tags, {Name = "Bastion-Autoscaling-Group"})]
+  default = [module.namespace.tags]
 }
 
 resource "aws_autoscaling_group" "my_asg" {
