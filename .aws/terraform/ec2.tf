@@ -169,10 +169,6 @@ resource "aws_launch_template" "bastion_launch_template" {
 }
 
 # Autoscaling Group
-variable "extra_tags" {
-  default = [module.namespace.tags]
-}
-
 resource "aws_autoscaling_group" "my_asg" {
   name_prefix = "bastionasg-"
   desired_capacity   = 1
@@ -194,13 +190,5 @@ resource "aws_autoscaling_group" "my_asg" {
       min_healthy_percentage = 50
     }
     triggers = [ "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
-  }  
-  dynamic "tag" {
-    for_each = var.extra_tags
-    content {
-      key                 = tag.value.key
-      propagate_at_launch = true
-      value               = tag.value.value
-    }
-  }      
+  }       
 }
