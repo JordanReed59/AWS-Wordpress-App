@@ -123,10 +123,10 @@ resource "aws_launch_template" "wp_launch_template" {
   instance_type = "t2.micro"
   key_name = "WordpressKeyPair"
   update_default_version = true
-  network_interfaces {
-    associate_public_ip_address = true
-    security_groups = [aws_security_group.ec2_wordpress_sg.id]
-  }
+  # network_interfaces {
+  #   associate_public_ip_address = true
+  #   security_groups = [aws_security_group.ec2_wordpress_sg.id]
+  # }
   monitoring {
     enabled = true
   }
