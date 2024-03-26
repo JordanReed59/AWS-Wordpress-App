@@ -71,7 +71,7 @@ resource "aws_route_table" "private_compute_rt" {
    cidr_block = "0.0.0.0/0"
    gateway_id = aws_nat_gateway.nat_gw[count.index].id
  }
- tags = merge(module.namespace.tags, {Name = "Private Compute Route Table ${count.index}"})
+ tags = merge(module.namespace.tags, {Name = "Private Compute Route Table ${count.index + 1}"})
 }
 
 resource "aws_route_table_association" "private_compute_subnet_asso" {
