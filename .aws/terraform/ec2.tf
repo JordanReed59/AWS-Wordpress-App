@@ -121,7 +121,7 @@ resource "aws_launch_template" "wp_launch_template" {
   description = "My Wordpress Launch Template"
   image_id = data.aws_ami.amzlinux2_wp.id
   instance_type = "t2.micro"
-  key_name = "WordpressKeyPair.pem"
+  key_name = "WordpressKeyPair"
   update_default_version = true
   network_interfaces {
     associate_public_ip_address = true
