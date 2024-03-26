@@ -146,7 +146,7 @@ resource "aws_launch_template" "bastion_launch_template" {
   image_id = data.aws_ami.amzlinux2.id
   instance_type = "t2.micro"
 
-  vpc_security_group_ids = [aws_security_group.ec2_bastion_sg.id]
+  # vpc_security_group_ids = [aws_security_group.ec2_bastion_sg.id]
   key_name = "MgmtKeyPair"
   update_default_version = true
   block_device_mappings {
