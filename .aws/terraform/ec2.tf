@@ -116,7 +116,8 @@ resource "aws_security_group" "ec2_bastion_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {
   security_group_id = aws_security_group.ec2_bastion_sg.id
-  cidr_ipv4         = var.my_ip
+  # cidr_ipv4         = var.my_ip
+  cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
@@ -179,7 +180,7 @@ resource "aws_autoscaling_group" "my_asg" {
   min_size           = 1
   vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
   health_check_type = "EC2"
-  health_check_grace_period = 900 # default is 300 seconds  
+  health_check_grace_period = 300 # default is 300 seconds  
   # Launch Template
   launch_template {
     id      = aws_launch_template.bastion_launch_template.id
