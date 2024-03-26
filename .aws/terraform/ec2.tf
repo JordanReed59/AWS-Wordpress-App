@@ -35,14 +35,12 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
   tags = merge(module.namespace.tags, {Name = "allow-alb-https"})
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "allow_rds_wordpress" {
-#   security_group_id = aws_security_group.ec2_wordpress_sg.id
-#   referenced_security_group_id = aws_security_group.rds_sg.id
-#   from_port         = 3306
-#   ip_protocol       = "tcp"
-#   to_port           = 3306
-#   tags = merge(module.namespace.tags, {Name = "allow-rds-inbound-wordpress"})
-# }
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.ec2_wordpress_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+  tags = merge(module.namespace.tags, {Name = "allow-outbound"})
+}
 
 # EC2 Instance Profile and Role
 resource "aws_iam_instance_profile" "test_profile" {
