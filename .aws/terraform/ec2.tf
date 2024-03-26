@@ -116,8 +116,8 @@ resource "aws_security_group" "ec2_bastion_sg" {
 
 resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {
   security_group_id = aws_security_group.ec2_bastion_sg.id
-  # cidr_ipv4         = var.my_ip
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = var.my_ip
+  # cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
@@ -150,14 +150,14 @@ resource "aws_launch_template" "bastion_launch_template" {
   # vpc_security_group_ids = [aws_security_group.ec2_bastion_sg.id]
   key_name = "MgmtKeyPair"
   update_default_version = true
-  block_device_mappings {
-    device_name = "/dev/sda1"
-    ebs {
-      volume_size = 8      
-      delete_on_termination = true
-      volume_type = "gp2"
-     }
-  }
+  # block_device_mappings {
+  #   device_name = "/dev/sda1"
+  #   ebs {
+  #     volume_size = 8      
+  #     delete_on_termination = true
+  #     volume_type = "gp2"
+  #    }
+  # }
   network_interfaces {
     associate_public_ip_address = true
     security_groups = [aws_security_group.ec2_bastion_sg.id]
@@ -168,31 +168,31 @@ resource "aws_launch_template" "bastion_launch_template" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = merge(module.namespace.tags, {Name = "Bastion-Launch-Template"})
+    tags = merge(module.namespace.tags, {Name = "Bastion Host"})
   }
 }
 
 # Autoscaling Group
-resource "aws_autoscaling_group" "my_asg" {
-  name_prefix = "bastionasg-"
-  desired_capacity   = 1
-  max_size           = 1
-  min_size           = 1
-  vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
-  health_check_type = "EC2"
-  health_check_grace_period = 300 # default is 300 seconds  
-  # Launch Template
-  launch_template {
-    id      = aws_launch_template.bastion_launch_template.id
-    version = aws_launch_template.bastion_launch_template.latest_version
-  }
-  # Instance Refresh
-  instance_refresh {
-    strategy = "Rolling"
-    preferences {
-      #instance_warmup = 300 # Default behavior is to use the Auto Scaling Group's health check grace period.
-      min_healthy_percentage = 50
-    }
-    triggers = [ "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
-  }       
-}
+# resource "aws_autoscaling_group" "my_asg" {
+#   name_prefix = "bastionasg-"
+#   desired_capacity   = 1
+#   max_size           = 1
+#   min_size           = 1
+#   vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
+#   health_check_type = "EC2"
+#   health_check_grace_period = 300 # default is 300 seconds  
+#   # Launch Template
+#   launch_template {
+#     id      = aws_launch_template.bastion_launch_template.id
+#     version = aws_launch_template.bastion_launch_template.latest_version
+#   }
+#   # Instance Refresh
+#   instance_refresh {
+#     strategy = "Rolling"
+#     preferences {
+#       #instance_warmup = 300 # Default behavior is to use the Auto Scaling Group's health check grace period.
+#       min_healthy_percentage = 50
+#     }
+#     triggers = [ "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
+#   }       
+# }
