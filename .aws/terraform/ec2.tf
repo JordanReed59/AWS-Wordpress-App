@@ -135,8 +135,8 @@ data "aws_ami" "amzlinux2" {
   owners      = ["amazon"]
   most_recent = true
   filter {
-    name = "name"
-    values = ["amzn2-ami-hvm-x86_64-gp2"]
+    name = "image-id"
+    values = ["ami-033a1ebf088e56e81"]
   }
 }
 
