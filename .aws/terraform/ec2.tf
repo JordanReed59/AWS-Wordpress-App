@@ -159,6 +159,7 @@ resource "aws_launch_template" "bastion_launch_template" {
   }
   network_interfaces {
     associate_public_ip_address = true
+    security_groups = [aws_security_group.ec2_bastion_sg.id]
   }
   monitoring {
     enabled = true
