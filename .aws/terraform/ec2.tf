@@ -123,10 +123,9 @@ resource "aws_launch_template" "wp_launch_template" {
   instance_type = "t2.micro"
   key_name = "WordpressKeyPair"
   update_default_version = true
-  # network_interfaces {
-  #   associate_public_ip_address = true
-  #   security_groups = [aws_security_group.ec2_wordpress_sg.id]
-  # }
+  network_interfaces {
+    security_groups = [aws_security_group.ec2_wordpress_sg.id]
+  }
   monitoring {
     enabled = true
   }
@@ -172,7 +171,6 @@ resource "aws_security_group" "ec2_bastion_sg" {
 resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {
   security_group_id = aws_security_group.ec2_bastion_sg.id
   cidr_ipv4         = var.my_ip
-  # cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
