@@ -146,18 +146,8 @@ resource "aws_launch_template" "bastion_launch_template" {
   description = "My Bastion Host Launch Template"
   image_id = data.aws_ami.amzlinux2.id
   instance_type = "t2.micro"
-
-  # vpc_security_group_ids = [aws_security_group.ec2_bastion_sg.id]
   key_name = "MgmtKeyPair"
   update_default_version = true
-  # block_device_mappings {
-  #   device_name = "/dev/sda1"
-  #   ebs {
-  #     volume_size = 8      
-  #     delete_on_termination = true
-  #     volume_type = "gp2"
-  #    }
-  # }
   network_interfaces {
     associate_public_ip_address = true
     security_groups = [aws_security_group.ec2_bastion_sg.id]
@@ -165,7 +155,6 @@ resource "aws_launch_template" "bastion_launch_template" {
   monitoring {
     enabled = true
   }
-
   tag_specifications {
     resource_type = "instance"
     tags = merge(module.namespace.tags, {Name = "Bastion Host"})
@@ -186,11 +175,9 @@ resource "aws_autoscaling_group" "my_asg" {
     id      = aws_launch_template.bastion_launch_template.id
     version = aws_launch_template.bastion_launch_template.latest_version
   }
-  # Instance Refresh
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      #instance_warmup = 300 # Default behavior is to use the Auto Scaling Group's health check grace period.
       min_healthy_percentage = 50
     }
     triggers = [ "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
