@@ -1,46 +1,5 @@
 ################### Security Groups ###################
-# Bastion host security group
-resource "aws_security_group" "ec2_bastion_sg" {
-  name        = "ec2_bastion_sg"
-  description = "Allow TLS inbound traffic and all outbound traffic"
-  vpc_id      = aws_vpc.wordpress_vpc.id
-  tags = merge(module.namespace.tags, {Name = "ec2-bastion-sg"})
-}
-
-resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {
-  security_group_id = aws_security_group.ec2_bastion_sg.id
-  cidr_ipv4         = var.my_ip
-  from_port         = 22
-  ip_protocol       = "tcp"
-  to_port           = 22
-  tags = merge(module.namespace.tags, {Name = "allow-ssh"})
-}
-
-resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_http" {
-  security_group_id = aws_security_group.ec2_bastion_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
-  ip_protocol       = "tcp"
-  to_port           = 80
-  tags = merge(module.namespace.tags, {Name = "allow-bastion-http"})
-}
-
-# resource "aws_vpc_security_group_ingress_rule" "allow_rds_bastion" {
-#   security_group_id = aws_security_group.ec2_bastion_sg.id
-#   referenced_security_group_id = aws_security_group.rds_sg.id
-#   from_port         = 3306
-#   ip_protocol       = "tcp"
-#   to_port           = 3306
-#   tags = merge(module.namespace.tags, {Name = "allow-rds-inbound-bastion"})
-# }
-
-resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
-  security_group_id = aws_security_group.ec2_bastion_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  ip_protocol       = "-1" # semantically equivalent to all ports
-  tags = merge(module.namespace.tags, {Name = "allow-outbound"})
-}
-
+# ###!!! update route table for private compute instances to route all internet traffic to nat gateways
 # Wordpress ec2 security group
 resource "aws_security_group" "ec2_wordpress_sg" {
   name        = "ec2_wordpress_sg"
@@ -85,9 +44,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
 #   tags = merge(module.namespace.tags, {Name = "allow-rds-inbound-wordpress"})
 # }
 
-################### Security Groups ###################
-
-################### EC2 Instance Profile and Role ###################
+# EC2 Instance Profile and Role
 resource "aws_iam_instance_profile" "test_profile" {
   name = "EC2-Wordpress-Profile"
   role = aws_iam_role.ec2_role.name
@@ -134,7 +91,6 @@ data "aws_iam_policy_document" "policy" {
     actions   = ["ec2:DescribeInstances"]
     resources = ["*"]
   }
-  
 }
 
 resource "aws_iam_policy" "policy" {
@@ -148,3 +104,103 @@ resource "aws_iam_role_policy_attachment" "policy_attach" {
   policy_arn = aws_iam_policy.policy.arn
 }
 ################### EC2 Role ###################
+
+################### Bastion Host ###################
+# Security Group
+resource "aws_security_group" "ec2_bastion_sg" {
+  name        = "ec2_bastion_sg"
+  description = "Allow TLS inbound traffic and all outbound traffic"
+  vpc_id      = aws_vpc.wordpress_vpc.id
+  tags = merge(module.namespace.tags, {Name = "ec2-bastion-sg"})
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ec2_bastion_sg_ssh" {
+  security_group_id = aws_security_group.ec2_bastion_sg.id
+  cidr_ipv4         = var.my_ip
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+  tags = merge(module.namespace.tags, {Name = "allow-ssh"})
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.ec2_bastion_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+  tags = merge(module.namespace.tags, {Name = "allow-outbound"})
+}
+
+# Launch Template
+data "aws_ami" "amzlinux2" {
+  owners      = ["amazon"]
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["amzn2-ami-hvm-2.0.20200917.0-x86_64-gp2"]
+  }
+}
+
+resource "aws_launch_template" "bastion_launch_template" {
+  name = "Bastion-Launch-Template"
+  description = "My Bastion Host Launch Template"
+  image_id = data.aws_ami.amzlinux2.id
+  instance_type = "t2.micro"
+
+  vpc_security_group_ids = [aws_security_group.ec2_bastion_sg.id]
+  key_name = "MgmtKeyPair"
+  ebs_optimized = true
+  update_default_version = true
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_size = 8      
+      delete_on_termination = true
+      volume_type = "gp2"
+     }
+  }
+  monitoring {
+    enabled = true
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(module.namespace.tags, {Name = "Bastion-Launch-Template"})
+  }
+}
+
+# Autoscaling Group
+variable "extra_tags" {
+  default = [merge(module.namespace.tags, {Name = "Bastion-Autoscaling-Group"})]
+}
+
+resource "aws_autoscaling_group" "my_asg" {
+  name_prefix = "bastionasg-"
+  desired_capacity   = 1
+  max_size           = 1
+  min_size           = 1
+  vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
+  health_check_type = "EC2"
+  health_check_grace_period = 120 # default is 300 seconds  
+  # Launch Template
+  launch_template {
+    id      = aws_launch_template.bastion_launch_template.id
+    version = aws_launch_template.bastion_launch_template.latest_version
+  }
+  # Instance Refresh
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      #instance_warmup = 300 # Default behavior is to use the Auto Scaling Group's health check grace period.
+      min_healthy_percentage = 50
+    }
+    triggers = [ "desired_capacity" ] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
+  }  
+  dynamic "tag" {
+    for_each = var.extra_tags
+    content {
+      key                 = tag.value.key
+      propagate_at_launch = true
+      value               = tag.value.value
+    }
+  }      
+}
