@@ -148,7 +148,6 @@ resource "aws_launch_template" "bastion_launch_template" {
 
   vpc_security_group_ids = [aws_security_group.ec2_bastion_sg.id]
   key_name = "MgmtKeyPair"
-  ebs_optimized = true
   update_default_version = true
   block_device_mappings {
     device_name = "/dev/sda1"
