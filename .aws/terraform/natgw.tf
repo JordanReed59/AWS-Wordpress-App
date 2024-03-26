@@ -1,5 +1,5 @@
 resource "aws_eip" "eip" {
-  count      = 2
+  count      = length(var.public_sn_cidrs)
 #   domain     = "vpc"
   tags       = module.namespace.tags
   depends_on = [aws_internet_gateway.internet_gw]
