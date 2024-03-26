@@ -157,6 +157,9 @@ resource "aws_launch_template" "bastion_launch_template" {
       volume_type = "gp2"
      }
   }
+  network_interfaces {
+    associate_public_ip_address = true
+  }
   monitoring {
     enabled = true
   }
@@ -175,7 +178,7 @@ resource "aws_autoscaling_group" "my_asg" {
   min_size           = 1
   vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
   health_check_type = "EC2"
-  health_check_grace_period = 120 # default is 300 seconds  
+  health_check_grace_period = 300 # default is 300 seconds  
   # Launch Template
   launch_template {
     id      = aws_launch_template.bastion_launch_template.id
