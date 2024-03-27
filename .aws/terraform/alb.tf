@@ -35,7 +35,7 @@ resource "aws_lb_target_group" "wordpress_tg" {
     port                = 80  # Use port 80 for health checks
     interval            = 30
     protocol            = "HTTP"
-    path                = "/wp-includes/images/blank.gif"  # Use the root path for health checks
+    path                = "/healthcheck.html"  # Use the root path for health checks
     matcher             = "200"
     healthy_threshold   = 3
     unhealthy_threshold = 3
