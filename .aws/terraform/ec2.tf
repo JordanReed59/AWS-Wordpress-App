@@ -123,6 +123,7 @@ resource "aws_launch_template" "wp_launch_template" {
   instance_type = "t2.micro"
   key_name = "WordpressKeyPair"
   update_default_version = true
+  user_data = filebase64("${path.module}/files/bootstrap.sh")
   iam_instance_profile {
     arn = aws_iam_instance_profile.test_profile.arn
   }
