@@ -44,10 +44,10 @@ resource "aws_lb_target_group" "wordpress_tg" {
   tags = module.namespace.tags
 }
 
-resource "aws_autoscaling_attachment" "example" {
-  autoscaling_group_name = aws_autoscaling_group.my_wp_asg.id
-  lb_target_group_arn    = aws_lb_target_group.wordpress_tg.arn
-}
+# resource "aws_autoscaling_attachment" "example" {
+#   autoscaling_group_name = aws_autoscaling_group.my_wp_asg.id
+#   lb_target_group_arn    = aws_lb_target_group.wordpress_tg.arn
+# }
 
 # ALB
 resource "aws_lb" "wordpress_alb" {

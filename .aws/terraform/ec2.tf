@@ -147,6 +147,7 @@ resource "aws_autoscaling_group" "my_wp_asg" {
   vpc_zone_identifier  = aws_subnet.private_compute_subnets[*].id
   health_check_type = "EC2"
   health_check_grace_period = 300 # default is 300 seconds  
+  # target_group_arns = [aws_lb_target_group.wordpress_tg.arn]
   # Launch Template
   launch_template {
     id      = aws_launch_template.wp_launch_template.id
