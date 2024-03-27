@@ -123,6 +123,9 @@ resource "aws_launch_template" "wp_launch_template" {
   instance_type = "t2.micro"
   key_name = "WordpressKeyPair"
   update_default_version = true
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.test_profile.arn
+  }
   network_interfaces {
     security_groups = [aws_security_group.ec2_wordpress_sg.id]
   }
