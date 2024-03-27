@@ -35,35 +35,35 @@ data "aws_iam_policy_document" "allow_cloudfront_and_public_access" {
 }
 
 # public bucket config
-resource "aws_s3_bucket_public_access_block" "enable_block" {
-  bucket = aws_s3_bucket.media_bucket.id
-
-  block_public_acls       = false
-  block_public_policy     = true
-  ignore_public_acls      = false
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_ownership_controls" "ownership" {
-  bucket = aws_s3_bucket.media_bucket.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-  depends_on = [aws_s3_bucket_public_access_block.enable_block]
-}
-
-# resource "aws_s3_bucket_acl" "bucket_acl" {
-#   depends_on = [
-#     aws_s3_bucket_ownership_controls.ownership
-#   ]
-
+# resource "aws_s3_bucket_public_access_block" "enable_block" {
 #   bucket = aws_s3_bucket.media_bucket.id
-#   acl    = "public-read"
+
+#   block_public_acls       = false
+#   block_public_policy     = true
+#   ignore_public_acls      = false
+#   restrict_public_buckets = true
 # }
 
-# Code Bucket
-resource "aws_s3_bucket" "code_bucket" {
-  bucket = "${module.namespace.namespace}-code-bucket"
+# resource "aws_s3_bucket_ownership_controls" "ownership" {
+#   bucket = aws_s3_bucket.media_bucket.id
+#   rule {
+#     object_ownership = "BucketOwnerPreferred"
+#   }
+#   depends_on = [aws_s3_bucket_public_access_block.enable_block]
+# }
 
-  tags = module.namespace.tags
-}
+# # resource "aws_s3_bucket_acl" "bucket_acl" {
+# #   depends_on = [
+# #     aws_s3_bucket_ownership_controls.ownership
+# #   ]
+
+# #   bucket = aws_s3_bucket.media_bucket.id
+# #   acl    = "public-read"
+# # }
+
+# # Code Bucket
+# resource "aws_s3_bucket" "code_bucket" {
+#   bucket = "${module.namespace.namespace}-code-bucket"
+
+#   tags = module.namespace.tags
+# }
