@@ -48,3 +48,37 @@ resource "aws_autoscaling_attachment" "example" {
   autoscaling_group_name = aws_autoscaling_group.my_wp_asg.id
   lb_target_group_arn    = aws_lb_target_group.wordpress_tg.arn
 }
+
+# ALB
+resource "aws_lb" "wordpress_alb" {
+  name               = "wordpress-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+
+  subnets = aws_subnet.public_subnets[*].id
+}
+
+resource "aws_lb_listener" "wordpress_listener" {
+  load_balancer_arn = aws_lb.wordpress_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.wordpress_tg.arn
+  }
+}
+
+# Only if I get a domain and request a certificat
+# if i do need to change the above listener to redirect to https
+# resource "aws_lb_listener" "wordpress_listener" {
+#   load_balancer_arn = aws_lb.wordpress_alb.arn
+#   port              = "443"
+#   protocol          = "HTTPS"
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.wordpress_tg.arn
+#   }
+# }
