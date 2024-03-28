@@ -44,7 +44,7 @@ resource "aws_lb_target_group" "wordpress_tg" {
   tags = module.namespace.tags
 }
 resource "aws_lb_target_group" "test_tg" {
-  name     = "wordpress-tg"
+  name     = "test-tg"
   port     = 80  # Port 80 where WordPress is running
   protocol = "HTTP"
   vpc_id   = aws_vpc.wordpress_vpc.id
