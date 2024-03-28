@@ -53,7 +53,7 @@ resource "aws_lb" "wordpress_alb" {
   subnets = aws_subnet.public_subnets[*].id
   access_logs {
     bucket  = "alb-logs-wp.s3.amazonaws.com"
-    prefix  = "alb-access-logs/"
+    prefix  = "alb-access-logs"
     enabled = true
   }
 }
