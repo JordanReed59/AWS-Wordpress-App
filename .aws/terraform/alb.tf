@@ -34,9 +34,9 @@ resource "aws_lb_target_group" "wordpress_tg" {
     enabled             = true
     port                = 80  # Use port 80 for health checks
     interval            = 30
-    timeout             = 5
+    timeout             = 15
     protocol            = "HTTP"
-    path                = "/"  # Use the root path for health checks
+    path                = "/index.php"  # Use the root path for health checks
     matcher             = "200"
     healthy_threshold   = 3
     unhealthy_threshold = 3
