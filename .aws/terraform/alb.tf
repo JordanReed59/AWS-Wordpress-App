@@ -52,7 +52,7 @@ resource "aws_lb" "wordpress_alb" {
   security_groups    = [aws_security_group.alb_sg.id]
   subnets = aws_subnet.public_subnets[*].id
   access_logs {
-    bucket  = "alb-logs-wp.s3.amazonaws.com"
+    bucket  = aws_s3_bucket.alb_logs_bucket.bucket
     prefix  = "alb-access-logs"
     enabled = true
   }

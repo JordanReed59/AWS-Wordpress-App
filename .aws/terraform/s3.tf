@@ -61,9 +61,55 @@ data "aws_iam_policy_document" "allow_cloudfront_and_public_access" {
 # #   acl    = "public-read"
 # # }
 
-# # Code Bucket
-# resource "aws_s3_bucket" "code_bucket" {
-#   bucket = "${module.namespace.namespace}-code-bucket"
+# Code Bucket
+resource "aws_s3_bucket" "alb_logs_bucket" {
+  bucket = "${module.namespace.namespace}-alb-logs"
+  tags = module.namespace.tags
+}
 
-#   tags = module.namespace.tags
-# }
+resource "aws_s3_bucket_policy" "alb_logs_bucket_policy" {
+  bucket = aws_s3_bucket.alb_logs_bucket.id
+  policy = data.aws_iam_policy_document.policy_doc.json
+}
+
+data "aws_iam_policy_document" "policy_doc" {
+  statement {
+    sid       = "AllowELBRootAccount"
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.alb_logs_bucket.arn}/*"]
+    actions   = ["s3:PutObject"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::127311923021:root"]
+    }
+  }
+  statement {
+    sid       = "AWSLogDeliveryWrite"
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.alb_logs_bucket.arn}/*"]
+    actions   = ["s3:PutObject"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+  }
+  statement {
+    sid       = "AWSLogDeliveryAclCheck"
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.alb_logs_bucket.arn}"]
+    actions   = ["s3:GetBucketAcl"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+  }
+}
