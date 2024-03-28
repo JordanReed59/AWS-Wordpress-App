@@ -121,7 +121,7 @@ data "aws_ami" "amzlinux2_wp" {
   most_recent = true
   filter {
     name = "image-id"
-    values = ["ami-02da01727f7c58c9f"]
+    values = ["ami-0e7b93bbfb60dd9da"]
   }
 }
 
