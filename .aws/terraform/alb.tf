@@ -30,17 +30,17 @@ resource "aws_lb_target_group" "wordpress_tg" {
   port     = 80  # Port 80 where WordPress is running
   protocol = "HTTP"
   vpc_id   = aws_vpc.wordpress_vpc.id
-  health_check {
-    enabled             = true
-    port                = 80  # Use port 80 for health checks
-    interval            = 30
-    timeout             = 25
-    protocol            = "HTTP"
-    path                = "/"  # Use the root path for health checks
-    matcher             = "302"
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-  }
+  # health_check {
+  #   enabled             = true
+  #   port                = 80  # Use port 80 for health checks
+  #   interval            = 30
+  #   timeout             = 25
+  #   protocol            = "HTTP"
+  #   path                = "/"  # Use the root path for health checks
+  #   matcher             = "302"
+  #   healthy_threshold   = 3
+  #   unhealthy_threshold = 3
+  # }
   tags = module.namespace.tags
 }
 
