@@ -30,41 +30,19 @@ resource "aws_lb_target_group" "wordpress_tg" {
   port     = 80  # Port 80 where WordPress is running
   protocol = "HTTP"
   vpc_id   = aws_vpc.wordpress_vpc.id
-  # health_check {
-  #   enabled             = true
-  #   port                = 80  # Use port 80 for health checks
-  #   interval            = 30
-  #   timeout             = 25
-  #   protocol            = "HTTP"
-  #   path                = "/"  # Use the root path for health checks
-  #   matcher             = "302"
-  #   healthy_threshold   = 3
-  #   unhealthy_threshold = 3
-  # }
-  tags = module.namespace.tags
-}
-resource "aws_lb_target_group" "test_tg" {
-  name     = "test-tg"
-  port     = 80  # Port 80 where WordPress is running
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.wordpress_vpc.id
   health_check {
-    enabled             = false
-    # port                = 80  # Use port 80 for health checks
-    # interval            = 30
-    # timeout             = 25
-    # protocol            = "HTTP"
-    # path                = "/"  # Use the root path for health checks
-    # matcher             = "302"
-    # healthy_threshold   = 3
-    # unhealthy_threshold = 3
+    enabled             = true
+    port                = 80  # Use port 80 for health checks
+    interval            = 30
+    timeout             = 5
+    protocol            = "HTTP"
+    path                = "/"  # Use the root path for health checks
+    matcher             = "200"
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
   }
   tags = module.namespace.tags
 }
-# resource "aws_autoscaling_attachment" "example" {
-#   autoscaling_group_name = aws_autoscaling_group.my_wp_asg.id
-#   lb_target_group_arn    = aws_lb_target_group.wordpress_tg.arn
-# }
 
 # ALB
 resource "aws_lb" "wordpress_alb" {
