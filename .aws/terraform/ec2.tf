@@ -26,6 +26,15 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_http" {
   tags = merge(module.namespace.tags, {Name = "allow-alb-http"})
 }
 
+resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_http_bastion" {
+  security_group_id = aws_security_group.ec2_wordpress_sg.id
+  referenced_security_group_id = aws_security_group.ec2_bastion_sg.id
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+  tags = merge(module.namespace.tags, {Name = "allow-bastion-http"})
+}
+
 resource "aws_vpc_security_group_ingress_rule" "ec2_wordpress_sg_https" {
   security_group_id = aws_security_group.ec2_wordpress_sg.id
   referenced_security_group_id = aws_security_group.alb_sg.id
