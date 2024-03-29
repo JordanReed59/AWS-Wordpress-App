@@ -36,7 +36,7 @@ resource "aws_lb_target_group" "wordpress_tg" {
     interval            = 30
     timeout             = 15
     protocol            = "HTTP"
-    path                = "/"  # Use the root path for health checks
+    path                = "/healthcheck.html"  # Use the root path for health checks
     matcher             = "200"
     healthy_threshold   = 3
     unhealthy_threshold = 3
