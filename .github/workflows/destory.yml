@@ -12,6 +12,8 @@ env:
   AWS_BUCKET_KEY_NAME: ${{ secrets.AWS_BUCKET_KEY_NAME }}
   AWS_TF_ROLE: ${{ secrets.AWS_TF_ROLE }}
   GITHUB_BRANCH_NAME: ${{ github.ref_name }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  MY_IP: ${{ secrets.MY_IP }}
 
 jobs:
   destroy:
@@ -73,6 +75,8 @@ jobs:
           echo "TF_VAR_environment=${ENV}" >> $GITHUB_ENV
           echo "TF_VAR_branch=${GITHUB_BRANCH_NAME}" >> $GITHUB_ENV
           echo "TF_VAR_region=${AWS_REGION}" >> $GITHUB_ENV
+          echo "TF_VAR_db_password=${DB_PASSWORD}" >> $GITHUB_ENV
+          echo "TF_VAR_my_ip=${MY_IP}" >> $GITHUB_ENV
 
       - name: Terraform destroy
         run: terraform destroy -auto-approve

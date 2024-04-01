@@ -106,10 +106,6 @@ jobs:
       run:
         shell: bash
         working-directory: .aws/terraform
-    outputs:
-      ENCRYPTED_S3_BUCKET_NAME: ${{ steps.outputs.outputs.ENCRYPTED_S3_BUCKET_NAME }}
-      ENCRYPTED_API_INVOKE_URL: ${{ steps.outputs.outputs.ENCRYPTED_API_INVOKE_URL }}
-      ENCRYPTED_S3_SITE_URL: ${{ steps.outputs.outputs.ENCRYPTED_S3_SITE_URL }}
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
